@@ -9,15 +9,10 @@ import { SharedModule } from '@shared/shared.module';
 import { BoardsRoutingModule } from './boards-routing.module';
 import { BoardsComponent } from './pages/boards/boards.component';
 import { BoardComponent } from './pages/board/board.component';
-import { TodoDialogComponent } from './components/todo-dialog/todo-dialog.component';
-
+import { CardDialogComponent } from './components/todo-dialog/todo-dialog.component';
 
 @NgModule({
-  declarations: [
-    BoardsComponent,
-    BoardComponent,
-    TodoDialogComponent
-  ],
+  declarations: [BoardsComponent, BoardComponent, CardDialogComponent],
   imports: [
     CommonModule,
     BoardsRoutingModule,
@@ -25,7 +20,7 @@ import { TodoDialogComponent } from './components/todo-dialog/todo-dialog.compon
     DragDropModule,
     CdkAccordionModule,
     DialogModule,
-    FontAwesomeModule
-  ]
+    FontAwesomeModule,
+  ],
 })
-export class BoardsModule { }
+export class BoardsModule {}
