@@ -4,12 +4,14 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '@environments/environment';
 import { checkToken } from '@interceptors/token.interceptor';
 import { Board } from '@models/board.model';
+import { Card } from '@models/card.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BoardService {
   private readonly _http = inject(HttpClient);
+  private readonly _bufferSpace = 65536;
 
   readonly apiUrl = environment.API_URL;
 
@@ -17,5 +19,20 @@ export class BoardService {
     return this._http.get<Board>(`${this.apiUrl}/api/v1/boards/${id}`, {
       context: checkToken(),
     });
+  }
+
+  getPosition(cards: Card[], currentIndex: number) {
+    if (cards.length === 1) {
+      return this._bufferSpace;
+    } else if (currentIndex === 0) {
+      return cards[1].position / 2;
+    } else if (currentIndex === cards.length - 1) {
+      return cards[currentIndex - 1].position + this._bufferSpace;
+    } else {
+      return (
+        (cards[currentIndex - 1].position + cards[currentIndex + 1].position) /
+        2
+      );
+    }
   }
 }
