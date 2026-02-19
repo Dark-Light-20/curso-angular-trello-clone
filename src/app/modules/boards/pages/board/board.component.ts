@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import {
   CdkDragDrop,
   moveItemInArray,
@@ -7,7 +7,10 @@ import {
 import { Dialog } from '@angular/cdk/dialog';
 import { TodoDialogComponent } from '@boards/components/todo-dialog/todo-dialog.component';
 
-import { ToDo, Column } from '@models/todo.model';
+import { BoardService } from '@services/boards.service';
+import { ActivatedRoute } from '@angular/router';
+import { Board } from '@models/board.model';
+import { Card } from '@models/card.model';
 
 @Component({
   selector: 'app-board',
@@ -23,73 +26,60 @@ import { ToDo, Column } from '@models/todo.model';
     `,
   ],
 })
-export class BoardComponent {
-  columns: Column[] = [
-    {
-      title: 'ToDo',
-      todos: [
-        {
-          id: '1',
-          title: 'Make dishes',
-        },
-        {
-          id: '2',
-          title: 'Buy a unicorn',
-        },
-      ],
-    },
-    {
-      title: 'Doing',
-      todos: [
-        {
-          id: '3',
-          title: 'Watch Angular Path in Platzi',
-        },
-      ],
-    },
-    {
-      title: 'Done',
-      todos: [
-        {
-          id: '4',
-          title: 'Play video games',
-        },
-      ],
-    },
-  ];
+export class BoardComponent implements OnInit {
+  private readonly _boardService = inject(BoardService);
+  private readonly _dialog = inject(Dialog);
+  private readonly _activatedRoute = inject(ActivatedRoute);
 
-  constructor(private dialog: Dialog) {}
+  board: Board | null = null;
 
-  drop(event: CdkDragDrop<ToDo[]>) {
+  ngOnInit(): void {
+    this._activatedRoute.paramMap.subscribe((params) => {
+      const boardId = params.get('id');
+      if (boardId) {
+        this.getBoard(boardId);
+      }
+    });
+  }
+
+  getBoard(boardId: string) {
+    this._boardService.getBoard(boardId).subscribe((board) => {
+      this.board = board;
+    });
+  }
+
+  drop(event: CdkDragDrop<Card[]>) {
     if (event.previousContainer === event.container) {
       moveItemInArray(
         event.container.data,
         event.previousIndex,
-        event.currentIndex
+        event.currentIndex,
       );
     } else {
       transferArrayItem(
         event.previousContainer.data,
         event.container.data,
         event.previousIndex,
-        event.currentIndex
+        event.currentIndex,
       );
     }
   }
 
   addColumn() {
-    this.columns.push({
+    this.board?.lists.push({
+      id: crypto.randomUUID(),
       title: 'New Column',
-      todos: [],
+      position: this.board?.lists.length || 0,
+      cards: [],
     });
   }
 
-  openDialog(todo: ToDo) {
-    const dialogRef = this.dialog.open(TodoDialogComponent, {
+  openDialog(card: Card) {
+    const dialogRef = this._dialog.open(TodoDialogComponent, {
       minWidth: '300px',
       maxWidth: '50%',
       data: {
-        todo: todo,
+        card: card,
       },
     });
     dialogRef.closed.subscribe((output) => {

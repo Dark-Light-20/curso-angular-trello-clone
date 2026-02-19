@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { DialogRef, DIALOG_DATA } from '@angular/cdk/dialog';
 import {
   faClose,
@@ -9,10 +9,10 @@ import {
   faCheckSquare,
   faClock,
 } from '@fortawesome/free-solid-svg-icons';
-import { ToDo } from '@models/todo.model';
+import { Card } from '@models/card.model';
 
 interface InputData {
-  todo: ToDo;
+  card: Card;
 }
 
 interface OutputData {
@@ -24,6 +24,9 @@ interface OutputData {
   templateUrl: './todo-dialog.component.html',
 })
 export class TodoDialogComponent {
+  private readonly _dialogRef = inject(DialogRef<OutputData>);
+  private readonly _data = inject(DIALOG_DATA) as InputData;
+
   faClose = faClose;
   faCheckToSlot = faCheckToSlot;
   faBars = faBars;
@@ -32,16 +35,13 @@ export class TodoDialogComponent {
   faCheckSquare = faCheckSquare;
   faClock = faClock;
 
-  todo: ToDo;
+  card: Card;
 
-  constructor(
-    private dialogRef: DialogRef<OutputData>,
-    @Inject(DIALOG_DATA) data: InputData
-  ) {
-    this.todo = data.todo;
+  constructor() {
+    this.card = this._data.card;
   }
 
   close() {
-    this.dialogRef.close();
+    this._dialogRef.close();
   }
 }
