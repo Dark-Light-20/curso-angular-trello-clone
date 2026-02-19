@@ -1,10 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import {
   faBell,
   faInfoCircle,
   faClose,
-  faAngleDown
+  faAngleDown,
 } from '@fortawesome/free-solid-svg-icons';
 
 import { AuthService } from '@services/auth.service';
@@ -14,6 +14,9 @@ import { AuthService } from '@services/auth.service';
   templateUrl: './navbar.component.html',
 })
 export class NavbarComponent {
+  private readonly _authService = inject(AuthService);
+  private readonly _router = inject(Router);
+
   faBell = faBell;
   faInfoCircle = faInfoCircle;
   faClose = faClose;
@@ -21,17 +24,16 @@ export class NavbarComponent {
 
   isOpenOverlayAvatar = false;
   isOpenOverlayBoards = false;
+  isOpenOverlayCreateBoard = false;
 
-  user$ = this.authService.user$;
-
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
+  user$ = this._authService.user$;
 
   logout() {
-    this.authService.logout();
-    this.router.navigate(['/login']);
+    this._authService.logout();
+    this._router.navigate(['/login']);
   }
 
+  close(event: boolean) {
+    this.isOpenOverlayCreateBoard = event;
+  }
 }
